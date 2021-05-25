@@ -5,8 +5,8 @@ import (
 	"fmt"
 )
 
-// BadInstructionErr error returned while executing invalid instructions.
-var BadInstructionErr = errors.New("invalid instruction")
+// ErrBadInstruction error returned while executing invalid instructions.
+var ErrBadInstruction = errors.New("invalid instruction")
 
 // CPU implements the HackVM instruction set.
 type CPU struct {
@@ -201,7 +201,7 @@ func (c *CPU) Step() error {
 				aluOut = c.d | c.a
 			}
 		default:
-			return BadInstructionErr
+			return ErrBadInstruction
 		}
 
 		if err != nil {

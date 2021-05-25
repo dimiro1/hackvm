@@ -6,7 +6,6 @@ import (
 	"syscall/js"
 
 	"hackvm"
-	"hackvm/browser"
 	"hackvm/games"
 )
 
@@ -16,8 +15,8 @@ func main() {
 		panic(err)
 	}
 
-	screen := browser.NewHTMLCanvasDisplay()
-	keyboard := browser.NewKeyboard()
+	screen := newDisplay()
+	keyboard := newKeyboard()
 	keyboard.Setup()
 
 	ram, err := hackvm.NewRAM16K(screen, keyboard)

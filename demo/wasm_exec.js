@@ -247,8 +247,8 @@
 
 			const timeOrigin = Date.now() - performance.now();
 			this.importObject = {
-				wasi_unstable: {
-					// https://github.com/bytecodealliance/wasmtime/blob/master/docs/WASI-api.md#__wasi_fd_write
+				wasi_snapshot_preview1: {
+					// https://github.com/WebAssembly/WASI/blob/main/phases/snapshot/docs.md#fd_write
 					fd_write: function(fd, iovs_ptr, iovs_len, nwritten_ptr) {
 						let nwritten = 0;
 						if (fd == 1) {
@@ -275,6 +275,15 @@
 						}
 						mem().setUint32(nwritten_ptr, nwritten, true);
 						return 0;
+					},
+					"proc_exit": (code) => {
+						if (global.process) {
+							// Node.js
+							process.exit(code);
+						} else {
+							// Can't exit in a browser.
+							throw 'trying to exit with code ' + code;
+						}
 					},
 				},
 				env: {
@@ -396,9 +405,9 @@
 					},
 
 					// func valueInstanceOf(v ref, t ref) bool
-					//"syscall/js.valueInstanceOf": (sp) => {
-					//	mem().setUint8(sp + 24, loadValue(sp + 8) instanceof loadValue(sp + 16));
-					//},
+					"syscall/js.valueInstanceOf": (v_addr, t_addr) => {
+ 						return loadValue(v_addr) instanceof loadValue(t_addr);
+					},
 
 					// func copyBytesToGo(dst []byte, src ref) (int, bool)
 					"syscall/js.copyBytesToGo": (ret_addr, dest_addr, dest_len, dest_cap, source_addr) => {
@@ -426,7 +435,7 @@
 
 						const dst = loadValue(dest_addr);
 						const src = loadSlice(source_addr, source_len);
-						if (!(src instanceof Uint8Array || src instanceof Uint8ClampedArray)) {
+						if (!(dst instanceof Uint8Array || dst instanceof Uint8ClampedArray)) {
 							mem().setUint8(returned_status_addr, 0); // Return "not ok" status
 							return;
 						}

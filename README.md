@@ -7,19 +7,25 @@ https://tinygo.org/
 ## Compile to WebAssembly
 
 ```shell
-$ tinygo build -o web/main.wasm -target wasm cmd/main.go
+$ tinygo build -o demo/main.wasm -target wasm hackvm/cmd
 ```
 
 ## Start the server
 
 ```shell
-$ cd web
+$ cd demo
 $ go run main.go
 ```
 
 ## Voila
 
 ![Pong](screenshot.png "Pong running on HackVM")
+
+## Headless mode (Standard Go)
+
+```shell
+$ go run hackvm/cmd
+```
 
 ## References
 

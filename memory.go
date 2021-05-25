@@ -2,20 +2,20 @@ package hackvm
 
 import "errors"
 
-// BadAddressErr error returned while accessing an invalid memory address.
-var BadAddressErr = errors.New("invalid address")
+// ErrBadAddress error returned while accessing an invalid memory address.
+var ErrBadAddress = errors.New("invalid address")
 
 // WriteOnlyMemory interface for write only memories.
 type WriteOnlyMemory interface {
 	// WriteWord writes `word` into `address`.
-	// return BadAddressErr if an invalid address is given.
+	// return ErrBadAddress if an invalid address is given.
 	WriteWord(address int, word int) error
 }
 
 // ReadOnlyMemory interface for read only memories.
 type ReadOnlyMemory interface {
 	// ReadWord reads the contents of `address`.
-	// return BadAddressErr if an invalid address is given.
+	// return ErrBadAddress if an invalid address is given.
 	ReadWord(address int) (int, error)
 }
 
@@ -31,8 +31,8 @@ type ROM32K struct {
 }
 
 func (r *ROM32K) ReadWord(address int) (int, error) {
-	if address < 0 || address > len(r.rom) {
-		return 0, BadAddressErr
+	if address < 0 || int(address) > len(r.rom) {
+		return 0, ErrBadAddress
 	}
 
 	return r.rom[address], nil
@@ -71,7 +71,7 @@ func (r *RAM16K) ReadWord(address int) (int, error) {
 	}
 
 	if address > 0x6000 || address < 0 {
-		return 0, BadAddressErr
+		return 0, ErrBadAddress
 	}
 
 	if address <= 0x03FFF {
@@ -83,7 +83,7 @@ func (r *RAM16K) ReadWord(address int) (int, error) {
 
 func (r *RAM16K) WriteWord(address int, word int) error {
 	if address > 0x6000 || address < 0 {
-		return BadAddressErr
+		return ErrBadAddress
 	}
 
 	if address <= 0x03FFF {
